@@ -5,9 +5,9 @@ import os
 import math
 
 # Replace these with your own values
-api_id = 'your_api_id'
-api_hash = 'your_api_hash'
-bot_token = 'your_bot_token'
+api_id = '21204722'
+api_hash = '4f5b4bbc15e7f9df9961ac92e8fd219b'
+bot_token = '5782499781:AAHsp52YhPxonTz84FOi-stSMJ-281_jccI'
 
 # Initialize Pyrogram Client
 app = Client("tiktok_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
