@@ -3,7 +3,7 @@
    from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
    # Replace with your Bot Token
-   BOT_TOKEN = "YOUR_BOT_TOKEN"
+   BOT_TOKEN = "5782499781:AAHsp52YhPxonTz84FOi-stSMJ-281_jccI"
 
    def start(update, context):
        update.message.reply_text("Welcome! Send me a TikTok video link to download it.")
