@@ -1,69 +1,41 @@
-from pyrogram import Client, filters
-import requests
-import re
-import os
-import math
 
-# Replace these with your own values
-api_id = '21204722'
-api_hash = '4f5b4bbc15e7f9df9961ac92e8fd219b'
-bot_token = '5782499781:AAHsp52YhPxonTz84FOi-stSMJ-281_jccI'
+   import requests
+   from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-# Initialize Pyrogram Client
-app = Client("tiktok_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
+   # Replace with your Bot Token
+   BOT_TOKEN = "YOUR_BOT_TOKEN"
 
-# Function to download TikTok video with progress bar
-def download_tiktok_video(url, message):
-    video_id = re.search(r'/video/(\d+)', url)
-    if not video_id:
-        return None
+   def start(update, context):
+       update.message.reply_text("Welcome! Send me a TikTok video link to download it.")
 
-    video_id = video_id.group(1)
+   def download_tiktok(update, context):
+       url = update.message.text
+       if "tiktok.com" in url:
+           try:
+               # Use a TikTok API (optional) or a TikTok video downloader
+               # Example using a public TikTok downloader (replace this with your chosen method)
+               response = requests.get(f"https://www.tiktokdownloader.com/download?url={url}")
+               response.raise_for_status()  # Raise an exception for bad HTTP requests
+               video_url = response.text.split('"')[1]
 
-    # Replace with a real TikTok video download URL or service
-    download_url = f"https://api.tiktokv.com/aweme/v1/play/?video_id={video_id}&line=0&ratio=default&media_type=4&improve_bitrate=0&source=PackSourceEnum_PUBLISH"
+               # Send the downloaded video to the user
+               context.bot.send_video(chat_id=update.effective_chat.id, video=video_url)
 
-    try:
-        response = requests.get(download_url, stream=True)
-        total_size = int(response.headers.get('content-length', 0))
+           except Exception as e:
+               update.message.reply_text(f"Error: {e}")
+       else:
+           update.message.reply_text("Please provide a valid TikTok video link.")
 
-        if response.status_code == 200:
-            file_name = f"{video_id}.mp4"
-            with open(file_name, 'wb') as f:
-                downloaded_size = 0
-                chunk_size = 1024
-                for chunk in response.iter_content(chunk_size=chunk_size):
-                    if chunk:
-                        f.write(chunk)
-                        downloaded_size += len(chunk)
+   def main():
+       updater = Updater(BOT_TOKEN, use_context=True)
+       dispatcher = updater.dispatcher
 
-                        # Update progress bar
-                        progress = math.ceil(downloaded_size / total_size * 100)
-                        if progress % 10 == 0:  # Update every 10%
-                            app.send_message(
-                                chat_id=message.chat.id,
-                                text=f"Download progress: {progress}%"
-                            )
-            return file_name
-        else:
-            return None
-    except Exception as e:
-        print(f"Error downloading video: {e}")
-        return None
+       dispatcher.add_handler(CommandHandler("start", start))
+       dispatcher.add_handler(MessageHandler(Filters.text, download_tiktok))
 
-# Command handler for downloading TikTok videos
-@app.on_message(filters.command("download") & filters.text)
-async def download_tiktok(client, message):
-    url = message.text.split(maxsplit=1)[-1]
+       updater.start_polling()
+       updater.idle()
 
-    await message.reply_text("Downloading TikTok video...")
-
-    video_file = download_tiktok_video(url, message)
-    if video_file:
-        await message.reply_video(video_file, caption="Here is your TikTok video!")
-        os.remove(video_file)
-    else:
-        await message.reply_text("Failed to download the TikTok video. Please check the URL and try again.")
-
-# Run the bot
-app.run()
+   if __name__ == "__main__":
+       main()
+   
